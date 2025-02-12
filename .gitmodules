@@ -1,0 +1,3 @@
+[submodule "builder/tabbyAPI"]
+	path = builder/tabbyAPI
+	url = https://github.com/theroyallab/tabbyAPI.git
