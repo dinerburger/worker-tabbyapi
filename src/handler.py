@@ -1,15 +1,14 @@
 import asyncio
 import requests
-from engine import SGlangEngine
+from engine import TabbyAPIEngine
 from utils import process_response
 import runpod
 import os
 
 # Initialize the engine
-engine = SGlangEngine()
+engine = TabbyAPIEngine()
 engine.start_server()
 engine.wait_for_server()
-
 
 def get_max_concurrency(default=300):
     """
@@ -57,4 +56,7 @@ async def async_handler(job):
         else:
             yield {"error": f"Generate request failed with status code {response.status_code}", "details": response.text}
 
-runpod.serverless.start({"handler": async_handler, "concurrency_modifier": get_max_concurrency, "return_aggregate_stream": True})
+runpod.serverless.start({
+    "handler": async_handler, 
+    "concurrency_modifier": get_max_concurrency, 
+    "return_aggregate_stream": True})
