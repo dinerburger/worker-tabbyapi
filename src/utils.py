@@ -1,6 +1,5 @@
 import json
 
-
 def format_chunk(chunk):
     chunk = chunk.strip()
     if chunk.startswith('data: '):
