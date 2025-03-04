@@ -1,0 +1,42 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Serverless Handler",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/handler.py",
+      "console": "integratedTerminal",
+      "args": [
+        "--rp_log_level", "DEBUG",
+        "--rp_serve_api",
+        "--rp_api_port", "9999",
+        "--rp_api_host", "0.0.0.0",
+        "--rp_debugger"
+      ],
+      "justMyCode": false,
+      "env": {
+        "CONFIG_PATH": "${HOME}/tabbyAPI/config-phi-4-serverless.yml",
+        "TABBY_PYTHON_COMMAND": "${HOME}/tabbyAPI/.venv/bin/python",
+        "TABBY_MAIN": "${HOME}/tabbyAPI/main.py"
+      }
+    },
+    {
+      "name": "Local Test",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/testlocal.py",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Remote Test",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/testremote.py",
+      "console": "integratedTerminal"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{ "input": {
+  "openai_input": {
+    "max_tokens": 256,
+    "messages": [
+      {
+        "content": "What is the greatest and best song in the world?",
+        "role": "user"
+      }
+    ],
+    "model": "SmolLM-1.7B-Instruct-bpw4.2-exl2",
+    "stream": false,
+    "temperature": 0.6
+  },
+  "openai_route": "/v1/chat/completions"
+}}

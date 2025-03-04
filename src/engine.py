@@ -7,14 +7,16 @@ import aiohttp
 import os
 
 class TabbyAPIEngine:
-    def __init__(self, config_path="/src/config.yml"):
+    def __init__(self, config_path="/src/config.yml", tabby_python_command="python3", tabby_main="/tabbyAPI/main.py"):
         self.config_path = config_path
+        self.tabby_main = tabby_main
+        self.tabby_python_command = tabby_python_command
         self.base_url = "http://127.0.0.1:5000"
         self.process = None
     
     def start_server(self):
         command = [
-            "python3", "/tabbyAPI/main.py", "--config", self.config_path
+            self.tabby_python_command, self.tabby_main, "--config", self.config_path
         ]
         self.process = subprocess.Popen(command, stdout=None, stderr=None)
 
@@ -42,31 +44,13 @@ class OpenAIRequest:
         self.client = openai.Client(base_url=base_url, api_key=api_key)
     
     async def request_chat_completions(
-            self, model="default", 
-            messages=None, 
-            max_tokens=100, 
+            self, 
             stream=False, 
-            frequency_penalty=0.0, 
-            n=1, 
-            stop=None, 
-            temperature=1.0, 
-            top_p=1.0
+            **kwargs
     ):
-        if messages is None:
-            messages = [
-                {"role": "system", "content": "You are a helpful AI assistant"},
-                {"role": "user", "content": "List 3 countries and their capitals."},
-            ]
-        
         response = self.client.chat.completions.create(
-            model=model,
-            messages=messages,
-            max_tokens=max_tokens,
-            stream=stream,frequency_penalty=frequency_penalty,
-            n=n,
-            stop=stop,
-            temperature=temperature,
-            top_p=top_p
+            stream=stream,
+            **kwargs
         )
         
         if stream:
@@ -77,26 +61,12 @@ class OpenAIRequest:
     
     async def request_completions(
             self, 
-            model="default", 
-            prompt="The capital of France is", 
-            max_tokens=100, 
-            stream=False, 
-            frequency_penalty=0.0, 
-            n=1, 
-            stop=None, 
-            temperature=1.0, 
-            top_p=1.0
+            stream=False,
+            **kwargs
     ):
         response = self.client.completions.create(
-            model=model,
-            prompt=prompt,
-            max_tokens=max_tokens,
-            stream=stream,
-            frequency_penalty=frequency_penalty,
-            n=n,
-            stop=stop,
-            temperature=temperature,
-            top_p=top_p
+            stream=stream
+            **kwargs
         )
         
         if stream:

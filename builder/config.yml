@@ -18,7 +18,7 @@ network:
   # Disable HTTP token authentication with requests.
   # WARNING: This will make your instance vulnerable!
   # Turn on this option if you are ONLY connecting from localhost.
-  disable_auth: false
+  disable_auth: true
 
   # Disable fetching external content in response to requests,such as images from URLs.
   disable_fetch_requests: false

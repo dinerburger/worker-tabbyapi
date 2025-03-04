@@ -1,6 +1,8 @@
 import json
+import typing
+from requests import Response
 
-def format_chunk(chunk):
+def format_chunk(chunk: str):
     chunk = chunk.strip()
     if chunk.startswith('data: '):
         chunk = chunk[6:]  # Remove 'data: ' prefix
@@ -18,7 +20,7 @@ def format_chunk(chunk):
         # If it's not valid JSON, return as plain text
         return f"data: {chunk}\n\n"
     
-def process_response(response):
+def process_response(response: Response):
     for line in response.iter_lines():
         if line:
             decoded_line = line.decode('utf-8')
