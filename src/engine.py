@@ -20,7 +20,7 @@ class TabbyAPIEngine:
         ]
         self.process = subprocess.Popen(command, stdout=None, stderr=None)
 
-    def wait_for_server(self, timeout=900, interval=5):
+    def wait_for_server(self, timeout=900, interval=1):
         start_time = time.time()
         while time.time() - start_time < timeout:
             try:
