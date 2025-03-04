@@ -19,9 +19,9 @@
       ],
       "justMyCode": false,
       "env": {
-        "CONFIG_PATH": "${HOME}/tabbyAPI/config-phi-4-serverless.yml",
-        "TABBY_PYTHON_COMMAND": "${HOME}/tabbyAPI/.venv/bin/python",
-        "TABBY_MAIN": "${HOME}/tabbyAPI/main.py"
+        "CONFIG_PATH": "${userHome}/tabbyAPI/config-phi-4-serverless.yml",
+        "TABBY_PYTHON_COMMAND": "${userHome}/tabbyAPI/.venv/bin/python",
+        "TABBY_MAIN": "${userHome}/tabbyAPI/main.py"
       }
     },
     {
