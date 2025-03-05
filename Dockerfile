@@ -9,6 +9,7 @@ FROM base AS pythondeps
 # Install Python dependencies
 COPY builder/requirements.txt /requirements.txt
 COPY builder/tabbyAPI /tabbyAPI
+ENV TABBY_PATH="/tabbyAPI"
 RUN --mount=type=cache,target=/root/.cache/pip \
     python3 -m pip install --upgrade pip && \
     python3 -m pip install --upgrade -r /requirements.txt && \
@@ -25,5 +26,6 @@ RUN if [ ! -f "${BASE_PATH}/${MODEL_NAME}/config.json" ]; then echo "ERROR: mode
 FROM model AS final
 COPY src /src
 COPY builder/config.yml /src
+ENV CONFIG_PATH="/src/config.yml"
 # Start the handler
 CMD ["python3", "/src/handler.py"]

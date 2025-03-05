@@ -1,23 +1,26 @@
+
+import sys
+import os
+
+# ok this is wack, I know but hear me out.
+# we need to add tabby to the python resolver path, but also we want to cleanly support
+# local development, so in the Dockerfile we export TABBY_PATH to where it should be 
+# I'm working fast here give me a break
+tabbypath = os.getenv(
+    "TABBY_PATH",
+    os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "builder", "tabbyAPI")))
+sys.path.append(tabbypath)
+
 import asyncio
 import aiohttp
 import requests
-from engine import TabbyAPIEngine, OpenAIRequest
-from utils import process_response
+from engine import TabbyAPIEngine
 import runpod
 import json
-import os
-
-CONFIG_PATH = os.getenv("CONFIG_PATH", "/src/config.yml")
-TABBY_MAIN = os.getenv("TABBY_MAIN", "/tabbyAPI/main.py")
-TABBY_PYTHON_COMMAND = os.getenv("TABBY_PYTHON_COMMAND", "python3")
 
 # Initialize the engine
-engine = TabbyAPIEngine(CONFIG_PATH, TABBY_PYTHON_COMMAND, TABBY_MAIN)
-engine.start_server()
-engine.wait_for_server()
-
-oai_req = OpenAIRequest()
-
+CONFIG_PATH = os.getenv("CONFIG_PATH", "/src/config.yml")
+engine = TabbyAPIEngine(CONFIG_PATH)
 def get_max_concurrency(default=50):
     """
     Returns the maximum concurrency value.
@@ -34,31 +37,33 @@ def get_max_concurrency(default=50):
 
 async def async_handler(job):
     """Handle the requests asynchronously."""
+    job_id = job["id"]
     job_input = job["input"]
     print(f"JOB_INPUT: {json.dumps(job_input)}")
     
     if job_input.get("openai_route"):
         openai_route, openai_input = job_input.get("openai_route"), job_input.get("openai_input")
-        openai_url = f"{engine.base_url}{openai_route}"
         headers = {"Content-Type": "application/json"}
-        if openai_route.startswith("/v1/model"):
-            response = requests.get(openai_url, headers=headers, json=openai_input)
-            yield response.text
-
-        elif openai_route == "/v1/chat/completions" or openai_route == "/v1/completions":
-            response = requests.post(openai_url, headers=headers, json=openai_input)
-        
-            if openai_input.get("stream", False):
-                # streamed response code
-                for formated_chunk in process_response(response):
-                    yield formated_chunk
+        if openai_route == "/v1/chat/completions":
+            stream = openai_input.get("stream", False)
+            if stream:
+                async for chunk in engine.stream_generate_chat_completion(openai_input, job_id):
+                    yield chunk
             else:
-                # non-streamed response code
-                for chunk in response.iter_lines():
-                    if chunk:
-                        decoded_chunk = chunk.decode('utf-8')
-                        yield decoded_chunk        
+                result = await engine.generate_chat_completion(openai_input, job_id)
+                yield result
+        elif openai_route == "/v1/completions":
+            stream = openai_input.get("stream", False)
+            if stream:
+                async for chunk in engine.stream_generate_completion(openai_input, job_id):
+                    yield chunk
+            else:
+                result = await engine.generate_completion(openai_input, job_id)
+                yield result
+        else:
+            raise Exception("Not implemented")
     else:
+        raise Exception("Not implemented")
         generate_url = f"{engine.base_url}/generate"
         headers = {"Content-Type": "application/json"}
         # Directly pass `job_input` to `json`. Can we tell users the possible fields of `job_input`?
